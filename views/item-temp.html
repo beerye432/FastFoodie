@@ -1,0 +1,363 @@
+<html lang = "en">
+
+	<head>
+		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+  		<script type="text/javascript" src="http://www.parsecdn.com/js/parse-1.5.0.min.js"></script>
+  		<script type = "text/javascript" src = "/javascripts/bootstrap.js"></script>
+  		<script type = "text/javascript" src = "/jquery-bar-rating-master/jquery.barrating.js"></script>
+		<link href = "/stylesheets/bootstrap.css" rel="stylesheet" media = "screen">
+		<link href = "/jquery-bar-rating-master/bars-square.css" rel="stylesheet" media = "screen">
+
+
+	</head>
+
+	<body style = "margin-left: 1.5%">
+
+		<div id = "dynamic">
+
+		<div class = "row">
+
+			<a id = "back_btn" onclick = "goBack()"></a>
+
+		</div>
+
+		<div id = "container1">
+
+			<div id = "profile_header" style = "width: 960px">
+
+				<div style = "width: 960px">
+
+					<div id = "prof_pic" style = "margin-left: 5px" class = "span1">
+
+					</div>
+
+					<p id = "name" style = "font-size: 65px"></p>
+
+					<div id = "main-body">
+
+					</div>
+
+				</div>
+			</div>
+
+		</div>
+
+		<!-- Trigger the modal with a button -->
+		<div>
+			<a><button type="button" class="btn btn-danger" data-toggle="modal" data-target="#myModal" id = "modal-button">Write a Review</button><a>
+
+			<!-- Modal -->
+			<div id="myModal" class="modal fade" role="dialog" style = "display: none">
+			  <div class="modal-dialog modal-lg">
+
+			    <!-- Modal content-->
+			    <div class="modal-content">
+			      <div class="modal-header">
+			        <button type="button" class="close" data-dismiss="modal">&times;</button>
+			      </div>
+
+			      <div class="modal-body">
+
+			      	<form class = "form-horizontal" id = "comment_form">
+
+				<div class="form-group" style = "margin-bottom: 2%">
+
+					<h1>Your Rating: </h1>
+
+				
+					<select id = "rating">
+						<option value = ""></option>
+						<option value = "1">1</option>
+						<option value = "2">2</option>
+						<option value = "3">3</option>
+						<option value = "4">4</option>
+						<option value = "5">5</option>
+						<option value = "6">6</option>
+						<option value = "7">7</option>
+						<option value = "8">8</option>
+						<option value = "9">9</option>
+						<option value = "10">10</option>
+					</select>
+
+
+				</div>
+
+				<div class = "form-group" style = "margin-bottom: 2%">
+
+					<input type = "text" style = "font-size: 70px; width: 930px; height: 150px" id = "comment-title" placeholder = "Title" maxlength = "45">
+
+				</div>
+
+				<div class = "form-group" style = "margin-bottom: 2%">
+
+					<textarea id = "comment-body" style = "font-size: 70px; width: 930px" placeholder = "Write a review" rows = "4" maxlength = "140"></textarea>
+					
+				</div>
+
+				<a><button class = 'btn btn-lg btn-success' style = 'font-size: 80px;width: 930px; height: 110px' id = 'submit-review' type = 'submit'> Submit</button></a>
+
+				
+			</form>
+
+	      </div>
+			    
+		</div>
+
+	</div>
+
+	</div>
+
+	</div>
+
+
+		<div id = "comment-section">
+
+		</div>
+
+		</div>			
+
+		</div>
+			
+				
+	</body>
+
+	<script>
+
+		Parse.initialize("BZHPIWPedZvh1MTYYfwwJcr85aW9AbTzQ3YtNIwh", "fCOkG4dtVeAJEMfaeUJHBQZkbCxnoNtIefq1i7Mb");
+
+		document.addEventListener("touchstart", function(){}, true);
+
+		var Restaurant = Parse.Object.extend("Restaurant");
+
+		var Comment = Parse.Object.extend("Comment");
+
+		var User = Parse.Object.extend("User");
+
+		var Item = Parse.Object.extend("Item");
+
+		var parser = document.createElement('a');
+
+		parser.href = window.location.href;
+
+		var current = parser.pathname.replace('/restaurant/','');
+
+		var res = current.split("/");
+
+		var place = res[2];
+
+		var item = res[3];
+
+		var current_item;
+
+		function populate(){
+
+			var query_item = new Parse.Query(Item);
+
+			query_item.equalTo("camel", item);
+
+			output = "";
+
+			query_item.first({
+
+				success: function(item_c){
+
+
+					var file = item_c.get("pic");
+
+					$('#prof_pic').css("background", "url("+file+") no-repeat center");
+					$('#prof_pic').css("background-size", "100% 100%");
+
+					output = "";
+
+					$('#name').append(item_c.get("name"));
+
+					//output += "<h1>Our Score: "+item_c.get("pro_score")+"</h1>";
+
+					//output += "<h1>Your Score: " + item_c.get("eater_score")+"</h1>";
+
+					//output += "<h1>Value Score: "+item_c.get("value")+"</h1>";
+
+					//output += "<h1>Expected Price: $"+item_c.get("price")+"</h1>";
+
+					//output += "<h1>Calories: "+item_c.get("calories")+"</h1>";
+
+					current_item = item_c;
+
+					$('#main-body').html(output);
+
+					output = "";
+
+					output += "<h1 id = 'recent_reviews'>"+item_c.get("rate_num")+" Reviews:</h1>";
+
+					$('#comment-section').append(output);
+
+					output = "";
+
+					if(0 == 1){
+
+						output += "<h2> Be the first to write a review! </h2>";
+
+						$('#comment-section').append(output);
+					}
+					else{
+
+						var query = new Parse.Query(Comment);
+
+						query.limit(10);
+
+						query.equalTo("from", current_item.get("camel"));
+
+						query.descending("createdAt");
+
+						query.find({
+
+							success: function(comments){
+
+								current_item.set("rate_num", comments.length);
+
+								for(var i in comments){
+
+									var pic = comments[i].get("pic");
+
+									output += "<div class = 'row'>";
+									output += "<a href = '/profile/"+comments[i].get("userId")+"'>";
+									output += "<div class = 'span2' id = 'comment_pic' style = 'margin-top: 20px; background: url("+pic+") no-repeat center; background-size: 100% 100%'></div>";
+									output += "<div id = 'comment_wrap'>";
+									output += "<h3 id = 'comment_heading'>"+comments[i].get("name")+"<span> | Rating: "+comments[i].get("rating")+"</h3>";
+									output += "<h3 id = 'date'>"+comments[i].createdAt.toDateString()+"</h3>";
+									output += "<span id = 'comment'>"+comments[i].get("body")+"</span>";
+									output += "</div>";
+									output += "</a>";
+									output += "</div><hr>"
+
+									$('#comment-section').append(output);
+
+									output = "";
+								}
+							}, error: function(error2){
+
+								console.log("Comment query fail " + error2.message);
+							}
+						});
+					}
+				}, error: function(error3){
+					console.log("Item query fail " + error3.message);
+				}
+			});
+
+			setTimeout(function(){
+				document.getElementById("dynamic").style.display = "block";
+			}, 300);
+		}
+
+		populate();
+
+		function goBack(){
+
+			window.history.back();
+		}
+
+		$(function(){
+			$('#rating').barrating({
+				theme: 'bars-square',
+				showSelectedRating: false,
+				showValues: true,
+				fastClicks: true
+			});
+		});
+
+		$('#modal-button').click(function(event){
+
+			if(!Parse.User.current()){
+				alert()
+			}
+
+			$('#myModal').css("display", "block");
+		});
+
+		$("#comment_form").submit(function(event){
+
+			event.preventDefault();
+
+			if(!Parse.User.current()){
+
+				var log = window.confirm("You must be logged in to leave a comment, would you like to create an account?");
+
+				if(log == true){
+					window.location.replace("/login");
+					return;
+				}
+				else{
+					window.location.replace('/')
+				}
+			}
+			var score = $('#rating').val();
+
+			var score_int = parseInt(score);
+
+			var title = $('#comment-title').val();
+
+			var comment = $('#comment-body').val();
+
+			var newComment = new Comment();
+
+			var userId = Parse.User.current().id;
+
+			newComment.set("userId", userId);
+
+			newComment.set("rating", score_int);
+
+			newComment.set("title", title);
+
+			newComment.set("body", comment);
+
+			newComment.set("from", current_item.get("camel"));
+
+			newComment.set("name", Parse.User.current().get("name"));
+
+			newComment.set("pic", Parse.User.current().get("profile_picture").url());
+
+			newComment.set("from_pic", current_item.get("pic"));
+
+			newComment.set("from_norm", current_item.get("name"));
+
+			newComment.save("from_place", current_item.get("place_camel"));
+
+			newComment.save("from_place_norm", current_item.get("place"));
+
+			var comment_num = current_item.get("rate_num");
+
+			comment_num += 1;
+
+			var rateNum = current_item.get("rate_total");
+
+			var rateTotal = rateNum + score_int;
+
+			var user_score_new = +(rateTotal/comment_num).toFixed(1);
+
+			Parse.User.current().increment("comments", 1);
+
+			Parse.User.current().save();
+
+			this.reset();
+
+			current_item.save(null,{
+				success: function(current_){
+					current_.set("rate_total", rateTotal);
+					current_.set("eater_score", user_score_new);
+					current_.increment("rate_num", 1);
+
+					current_item = current_;
+					current_.save();
+
+					if(!alert('Your review was added successfully!')){window.location.reload();}
+				},
+				error: function(error){
+					console.log("error " + error.message);
+				}
+			})
+		});
+
+	</script>
+
+</html>

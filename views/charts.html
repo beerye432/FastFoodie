@@ -1,0 +1,291 @@
+<html lang = "en">
+
+	<head>
+		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+  		<script type="text/javascript" src="http://www.parsecdn.com/js/parse-1.5.0.min.js"></script>
+		<link href = "/stylesheets/bootstrap.css" rel="stylesheet" media = "screen">
+
+		<script type = "text/javascript" src = "/javascripts/bootstrap.js"></script>
+		<meta name="viewport" content= "user-scalable=no">
+	</head>
+
+	<body>
+
+		<div class = "header" id = "dynamic">
+
+			<div class = "tabbable">
+
+				<div class = "row">
+
+					<ul class = "nav nav-pills nav-justified navbar-fixed-top" style = "padding-left: 30px">
+
+						<li class = "active" id = "chart-pills">
+							<a href = "#one" data-toggle="tab">Whats New</a>
+						</li>
+
+						<li id = "chart-pills">
+							<a href = "#two" data-toggle="tab">Highest Rated</a>
+						</li>
+
+						<li id = "chart-pills">
+							<a href = "#three" data-toggle="tab">Foodie Favs</a>
+						</li>
+					</ul>
+				</div>
+
+				<div class = "tab-content">
+					<div class = "tab-pane fade in active" id = "one">
+
+						<div style = "padding-bottom: 120px"></div>
+						<div id = "new" style = 'padding-bottom: 120px; background-color: #CCCCCC'>
+
+						</div>
+					</div>
+
+					<div class = "tab-pane fade in" id = "two">
+
+						<div style = "padding-bottom: 120px"></div>
+						<div id = "highest" style = 'padding-bottom: 120px; background-color: #CCCCCC'>
+
+						</div>
+					</div>
+
+					<div class = "tab-pane fade in" id = "three">
+
+						<div style = "padding-bottom: 120px"></div>
+						<div id = "best" style = 'padding-bottom: 120px; background-color: #CCCCCC'>
+
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<footer>
+
+				<ul class = "nav nav-pills navbar-fixed-bottom">
+
+					<li class = "active" id = "bott-nav" >
+						<a style = "padding-left: 34px; padding-right: 34px" href = "charts">Top Charts</a>
+					</li>
+
+					<li id = "bott-nav">
+						<a href = "restaurants">Restaurants</a>
+					</li>
+
+					<li id = "bott-nav">
+						<a style = "padding-left: 86px; padding-right: 88px" href = "profile">Profile</a>
+					</li>
+				</ul>
+			</footer>
+		</div>
+	</body>
+
+
+
+	<script type="text/javascript">
+
+		Parse.initialize("BZHPIWPedZvh1MTYYfwwJcr85aW9AbTzQ3YtNIwh", "fCOkG4dtVeAJEMfaeUJHBQZkbCxnoNtIefq1i7Mb");
+
+		document.addEventListener("touchstart", function(){}, true);
+
+		var Item = Parse.Object.extend("Item");
+
+		function populate(){
+
+			var query = new Parse.Query(Item);
+
+			query.limit(10);
+
+			query.descending("createdAt");
+
+			query.find({
+
+				success: function(results){
+
+					var output = "";
+
+					for(var i in results){
+
+						output += "<div class = 'row-fluid' style = 'background-color: #FFFFFF'>";
+
+						output += "<a href = '/restaurants/"+results[i].get("place_camel")+"/"+results[i].get("camel")+"'>";
+
+						//picture
+						output += "<div class = 'span4'><img class = 'img-responsive' style = 'width: 100%;height: '100%'; margin-top: 3%; margin-bottom: 10px' src ="+"'"+results[i].get("pic")+"'></div>";
+
+						//name
+						output += "<div class = 'span8' style = 'margin-top: 8px'><h1>"+results[i].get("name")+"</h1></div>";
+
+						output += "<div class = 'row-fluid'>";
+
+						//FastFoodie score
+						output += "<div class = 'span4' style = 'margin-left: 20.125px'><h3>FastFoodie Score: "+results[i].get("pro_score")+"</h3></div>";
+
+
+						output += "<div class = 'row-fluid'>";
+
+						//User Score
+						output += "<div class = 'span4' style = 'margin-left: 20.125px'><h3>User Score: "+results[i].get("eater_score")+"</h3></div>";
+
+						output += "<div class = 'row-fluid'>";
+
+						//Number of Scores
+						output += "<div class = 'span4' style = 'margin-left: 20.125px'><h3>"+results[i].get("rate_num")+" User Reviews</h3></div>";
+
+						//Value Score
+						output += "<div class = 'span4'><h3>Value Score: "+results[i].get("value")+"</h3></div>";
+
+						output += "</div>";
+
+						output += "</div>";
+
+						output += "</div>";
+
+						output += "</div>";
+
+						output += "</a><hr id = 'hr_new'>";
+
+						$('#new').append(output);
+
+						output = "";
+					}
+				}, 
+				error: function(error){
+					console.log("error " + error.message);
+				}
+			});
+
+			var query = new Parse.Query(Item);
+
+			query.limit(10);
+
+			query.descending("eater_score");
+
+			query.find({
+
+				success: function(results){
+
+					var output = "";
+
+					for(var i in results){
+
+						output += "<div class = 'row-fluid' style = 'background-color: #FFFFFF'>";
+
+						output += "<a href = '/restaurants/"+results[i].get("place_camel")+"/"+results[i].get("camel")+"'>";
+
+						//picture
+						output += "<div class = 'span4'><img class = 'img-responsive' style = 'width: 100%;height: '100%'; margin-top: 3%; margin-bottom: 10px' src ="+"'"+results[i].get("pic")+"'></div>";
+
+						//name
+						output += "<div class = 'span8' style = 'margin-top: 8px'><h1>"+results[i].get("name")+"</h1></div>";
+
+						output += "<div class = 'row-fluid'>";
+
+						//FastFoodie score
+						output += "<div class = 'span4' style = 'margin-left: 20.125px'><h3>FastFoodie Score: "+results[i].get("pro_score")+"</h3></div>";
+
+
+						output += "<div class = 'row-fluid'>";
+
+						//User Score
+						output += "<div class = 'span4' style = 'margin-left: 20.125px'><h3>User Score: "+results[i].get("eater_score")+"</h3></div>";
+
+						output += "<div class = 'row-fluid'>";
+
+						//Number of Scores
+						output += "<div class = 'span4' style = 'margin-left: 20.125px'><h3>"+results[i].get("rate_num")+" User Reviews</h3></div>";
+
+						//Value Score
+						output += "<div class = 'span4'><h3>Value Score: "+results[i].get("value")+"</h3></div>";
+
+						output += "</div>";
+
+						output += "</div>";
+
+						output += "</div>";
+
+						output += "</div>";
+
+						output += "</a><hr id = 'hr_new'>";
+
+						$('#highest').append(output);
+
+						output = "";
+					}
+				}, 
+				error: function(error){
+					console.log("error " + error.message);
+				}
+			});
+
+			var query = new Parse.Query(Item);
+
+			query.limit(10);
+
+			query.descending("pro_score");
+
+			query.find({
+
+				success: function(results){
+
+					var output = "";
+
+					for(var i in results){
+
+						output += "<div class = 'row-fluid' style = 'background-color: #FFFFFF'>";
+
+						output += "<a href = '/restaurants/"+results[i].get("place_camel")+"/"+results[i].get("camel")+"'>";
+
+						//picture
+						output += "<div class = 'span4'><img class = 'img-responsive' style = 'width: 100%;height: '100%'; margin-top: 3%; margin-bottom: 10px' src ="+"'"+results[i].get("pic")+"'></div>";
+
+						//name
+						output += "<div class = 'span8' style = 'margin-top: 8px'><h1>"+results[i].get("name")+"</h1></div>";
+
+						output += "<div class = 'row-fluid'>";
+
+						//FastFoodie score
+						output += "<div class = 'span4' style = 'margin-left: 20.125px'><h3>FastFoodie Score: "+results[i].get("pro_score")+"</h3></div>";
+
+
+						output += "<div class = 'row-fluid'>";
+
+						//User Score
+						output += "<div class = 'span4' style = 'margin-left: 20.125px'><h3>User Score: "+results[i].get("eater_score")+"</h3></div>";
+
+						output += "<div class = 'row-fluid'>";
+
+						//Number of Scores
+						output += "<div class = 'span4' style = 'margin-left: 20.125px'><h3>"+results[i].get("rate_num")+" User Reviews</h3></div>";
+
+						//Value Score
+						output += "<div class = 'span4'><h3>Value Score: "+results[i].get("value")+"</h3></div>";
+
+						output += "</div>";
+
+						output += "</div>";
+
+						output += "</div>";
+
+						output += "</div>";
+
+						output += "</a><hr id = 'hr_new'>";
+
+						$('#best').append(output);
+
+						output = "";
+					}
+				}, 
+				error: function(error){
+					console.log("error " + error.message);
+				}
+			});
+
+			setTimeout(function(){
+				document.getElementById("dynamic").style.display = "block";
+			}, 300);
+			
+		}
+		populate();
+
+	</script>

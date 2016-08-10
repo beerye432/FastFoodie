@@ -1,0 +1,289 @@
+<html lang = "en">
+
+	<head>
+		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+  		<script type="text/javascript" src="http://www.parsecdn.com/js/parse-1.5.0.min.js"></script>
+  		<script type = "text/javascript" src = "/javascripts/bootstrap.js"></script>
+  		<script type = "text/javascript" src = "/jquery-bar-rating-master/jquery.barrating.js"></script>
+		<link href = "/stylesheets/bootstrap.css" rel="stylesheet" media = "screen">
+		<link href = "/jquery-bar-rating-master/bars-square.css" rel="stylesheet" media = "screen">
+
+		<meta content = "viewport" content = "user-scalable=no">
+
+
+	</head>
+
+	<body>
+		<div id = "dynamic">
+			<div class = "row">
+
+				<a id = "back_btn" onclick = "goBack()"></a>
+
+				<a id = "settings_btn" data-toggle = "modal" data-target="#myModal"></a>
+			</div>
+
+			<div id = "container1">
+				<div id = "profile_header" style = "width: 960px">
+
+					<div>
+
+						<div id = "prof_pic" class = "span1">
+
+						</div>
+
+						<div style = "margin-bottom: 40px">
+							<p id = "name">
+
+							</p>
+
+							<p id = "location">Long Beach, CA</p>
+
+						</div>
+					</div>
+				</div>
+
+				<div id = "comment-section">
+
+					<h1 id = "recent_reviews"> Recent Reviews</h1>
+
+					<hr>
+
+				</div>
+			</div>
+
+			<div>
+
+				<footer>
+
+					<ul class = "nav nav-pills navbar-fixed-bottom">
+
+						<li id = "bott-nav" >
+							<a style = "padding-left: 34px; padding-right: 34px" href = "/charts">Top Charts</a>
+						</li>
+
+						<li id = "bott-nav">
+							<a href = "restaurants">Restaurants</a>
+						</li>
+
+						<li class = "active" id = "bott-nav">
+							<a style = "padding-left: 86.5px; padding-right: 88px" href = "profile">Profile</a>
+						</li>
+					</ul>
+				</footer>
+			</div>
+
+			<div id="myModal" class="modal fade" role="dialog" style = "display: none">
+
+				<!-- Modal content-->
+			    <div class="modal-content">
+			      <div class="modal-header">
+			        <button type="button" class="close" data-dismiss="modal">&times;</button>
+			      </div>
+
+			      <div class="modal-body">
+
+			      	<h2 id = "usersince">
+
+					</h2>
+
+					
+					<form id = "prof-pic-form">
+						<input id = "post_pic" type = "file"><input>
+
+						<input id = "pic_submit" class = "btn btn-success" type = "submit">
+					</form>
+
+					<h3 id = "num_comments">
+
+					</h3>
+
+					<button style = "width: 50%px; height: 50px; line-height: 40px; font-size: 40px; margin-bottom: 3%" class = "btn btn-danger" id = "logout">Logout</button>
+				</div>
+			</div>
+		</div>
+	</body>
+
+	<script>
+
+		Parse.initialize("BZHPIWPedZvh1MTYYfwwJcr85aW9AbTzQ3YtNIwh", "fCOkG4dtVeAJEMfaeUJHBQZkbCxnoNtIefq1i7Mb");
+
+		document.addEventListener("touchstart", function(){}, true);
+
+		var Comments = Parse.Object.extend("Comment");
+
+		var Item = Parse.Object.extend("Item");
+
+		function goBack(){
+			window.history.back();
+		}
+
+		function populate(){
+
+			//user is logged in
+			if(Parse.User.current()){
+
+				$('#name').append(Parse.User.current().get("name"));
+
+				var date = Parse.User.current().createdAt;
+
+				$('#usersince').append("User Since: " +(date.getMonth()+1) + "/" + date.getDate() + "/" + date.getFullYear());
+
+			}
+			else{
+				var log = window.confirm("You must have a profile to view it, would you like to create an account?");
+
+				if(log == true){
+					window.location.replace("/login");
+					return;
+				}
+				else{
+					window.history.back();
+				}
+			}
+
+			if(Parse.User.current().get("profile_picture") == undefined){
+
+				$('#prof_pic').append('<img class = "img-responsive" id = "circle" style = "z-index: -1;height: 300px; width: 300px" src = "http://cdn.mysitemyway.com/icons-watermarks/simple-gray/raphael/raphael_bubble-question-mark/raphael_bubble-question-mark_simple-gray_512x512.png">');
+			}
+			else{
+
+				Parse.User.current().fetch().then(function(user){
+
+					var file = user.get("profile_picture");
+
+					var url = file.url();
+
+					$('#prof_pic').css("background", "url("+url+") no-repeat center");
+					$('#prof_pic').css("background-size", "100% 100%");
+
+				});
+				//var file = Parse.User.current().get("profile_picture");
+
+				//var url = file.url();
+
+				//$('#prof_pic').css("background", "url("+url+") no-repeat center");
+				//$('#prof_pic').css("background-size", "100% 100%");
+
+				//$('#prof_pic').append('<img class = "img-responsive" style = "height: 200px; width: 200px" src = "'+url+'">');
+			}
+
+			$('#num_comments').append(Parse.User.current().get("comments") + " Reviews");
+
+			var query = new Parse.Query(Comments);
+
+			query.limit(10);
+
+			query.descending("createdAt");
+
+			query.equalTo("userId", Parse.User.current().id);
+
+			var output = "";
+
+			query.find({
+
+				success: function(comments){
+
+					for(var i in comments){
+
+						//var pic = Parse.User.current().get("profile_picture").url();
+						
+						output += "<div class = 'row' id = 'comment_row'>";
+						output += "<a href = '/restaurants/"+comments[i].get("from_place")+'/'+comments[i].get("from")+"'>";
+						output += "<div class = 'span2' id = 'comment_pic' style = 'margin-top: 15px; background: url("+comments[i].get("from_pic")+") no-repeat center; background-size: 100% 100%'></div>";
+						output += "<div id = 'comment_wrap'>";
+						output += "<h3 id = 'comment_heading'>"+comments[i].get("from_norm")+" @ " +comments[i].get("from_place_norm")+"</h3>";
+						output += "<h3 id = 'date'>"+comments[i].createdAt.toDateString()+"</h3>";
+
+						output += "<span id = 'comment'>"+comments[i].get("body")+"</span>";
+						output += "</div>";
+						output += "</a>";
+						output += "</div><hr>";
+
+						$('#comment-section').append(output);
+
+						output = "";
+					}
+
+				}, 
+				error: function(error){
+					console.log("error " + error.message);
+				}
+			});	
+
+			setTimeout(function(){
+				document.getElementById("dynamic").style.display = "block";
+			}, 300);
+		}
+
+		populate();
+
+		$('#modal-button').click(function(event){
+
+			if(!Parse.User.current()){
+				alert()
+			}
+
+			$('#myModal').css("display", "block");
+		});
+
+		$("#logout").click(function(event){
+
+			if(Parse.User.current()){
+
+				Parse.User.logOut();
+
+				if(!alert('You have been logged out, see you next time!')){window.location.replace('/login');}
+			}
+			else{
+
+				alert("You aren't logged in!");
+				return;
+			}
+		});
+
+		$('#prof-pic-form').submit(function(event){
+
+			event.preventDefault();
+
+			var fileElement = $('#post_pic')[0];
+			var filePath = $('#post_pic').val();
+			var fileName = filePath.split("\\").pop();
+
+			if(fileElement.files.length > 0){
+
+				var file = fileElement.files[0];
+
+				var newFile = new Parse.File(fileName, file);
+				newFile.save({
+					success: function(){
+
+						
+						if(!alert('Profile picture changed successfully!')){window.location.reload();}
+
+					}, error: function(error){
+
+						alert("File Save Error: " + error.message);
+
+					}
+				}).then(function(theFile){
+
+					Parse.User.current().set("profile_picture", theFile);
+					Parse.User.current().save({
+						success: function(){
+
+							window.location.reload();
+
+						}, error: function(error){
+							alert("Profile Save Error: "+ error.message);
+						}
+					});
+				});
+			}
+			else{
+				console.log("No file to upload");
+			}
+		});
+
+
+
+	</script>

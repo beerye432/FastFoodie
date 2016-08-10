@@ -1,0 +1,143 @@
+<html lang = "en">
+
+	<head>
+		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+  		<script type="text/javascript" src="http://www.parsecdn.com/js/parse-1.5.0.min.js"></script>
+		<link href = "/stylesheets/bootstrap.css" rel="stylesheet" media = "screen">
+
+	</head>
+
+	<body>
+		<div id = "dynamic">
+
+			<div id = "res-header" style = "margin-bottom: 2%">
+
+			</div>
+
+			<div id = "item-list" style = 'padding-top: 7px; background-color: #CCCCCC'>
+
+			</div>
+		</div>
+	</body>
+
+	<script>
+
+		Parse.initialize("BZHPIWPedZvh1MTYYfwwJcr85aW9AbTzQ3YtNIwh", "fCOkG4dtVeAJEMfaeUJHBQZkbCxnoNtIefq1i7Mb");
+
+		document.addEventListener("touchstart", function(){}, true);
+
+		var Restaurant = Parse.Object.extend("Restaurant");
+
+		function populate(){
+
+			var parser = document.createElement('a');
+
+			parser.href = window.location.href;
+
+			var current = parser.pathname.replace('/restaurants/', '');
+
+			var query = new Parse.Query(Restaurant);
+
+			query.equalTo("camel", current);
+
+			query.first({
+
+				success: function(results){
+
+					var output = "";
+					
+					var items = results.get("menu");
+
+					var place = results.get("name");
+
+					var results_late = results;
+
+					output = "<a class = 'btn btn-primary' style = 'width: 150px; height: 50px; margin-top: 25px; font-size: 20px' href = '/restaurants/'>Back to Restaurants</a>";
+
+					output += "<img class = 'img-center' style = 'margin-top:2%;margin-bottom: 2%;width: 50%;height:'50%' src ="+"'"+results.get("img")+"'>";
+
+					output += "</div>";
+
+					$('#res-header').html(output);
+
+					output = "";
+
+					output += "<div class = 'container-fluid'>";
+
+					var Item = Parse.Object.extend("Item");
+
+					var itemQ = new Parse.Query(Item);
+
+					$('#item-list').html(output);
+
+					itemQ.equalTo("place", place);
+
+					itemQ.ascending("name");
+
+					itemQ.find({
+
+						success: function(item_c){
+
+							for(var i in item_c){
+
+								output += "<div class = 'row-fluid' style = 'background-color: #FFFFFF'>";
+
+								output += "<a href = '/restaurants/"+results_late.get("camel")+"/"+item_c[i].get("camel")+"'>";
+
+								//picture
+								output += "<div class = 'span4'><img class = 'img-responsive' style = 'width: 100%;height: '100%'; margin-top: 3%; margin-bottom: 10px' src ="+"'"+item_c[i].get("pic")+"'></div>";
+
+								//name
+								output += "<div class = 'span8' style = 'margin-top: 8px'><h1>"+item_c[i].get("name")+"</h1></div>";
+
+								output += "<div class = 'row-fluid'>";
+
+								//FastFoodie score
+								output += "<div class = 'span4' style = 'margin-left: 20.125px'><h3>FastFoodie Score: "+item_c[i].get("pro_score")+"</h3></div>";
+
+
+								output += "<div class = 'row-fluid'>";
+
+								//User Score
+								output += "<div class = 'span4' style = 'margin-left: 20.125px'><h3>User Score: "+item_c[i].get("eater_score")+"</h3></div>";
+
+								output += "<div class = 'row-fluid'>";
+
+								//Number of Scores
+								output += "<div class = 'span4' style = 'margin-left: 20.125px'><h3>"+item_c[i].get("rate_num")+" User Reviews</h3></div>";
+
+								//Value Score
+								output += "<div class = 'span4'><h3>Value Score: "+item_c[i].get("value")+"</h3></div>";
+
+								output += "</div>";
+
+								output += "</div>";
+
+								output += "</div>";
+
+								output += "</div>";
+
+								output += "</a><hr id = 'hr_new'>";
+
+								$('#item-list').html(output);
+							}
+
+						}, error: function(error){
+
+						}
+					});
+					
+				}, error: function(error){
+
+					$("#item-list").html("<h1>No Restaurants in DB!</h1>");
+				}
+			});
+
+			setTimeout(function(){
+				document.getElementById("dynamic").style.display = "block";
+			}, 300);
+		}
+		populate();
+	</script>
+</html>
+

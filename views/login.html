@@ -1,0 +1,231 @@
+<html lang = "en">
+
+	<head>
+		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+  		<script type="text/javascript" src="http://www.parsecdn.com/js/parse-1.5.0.min.js"></script>
+		<link href = "/stylesheets/bootstrap.css" rel="stylesheet" media = "screen">
+		<meta content = "user-scalable=no">
+	</head>
+
+	<body>
+
+		<script>
+
+			Parse.initialize("BZHPIWPedZvh1MTYYfwwJcr85aW9AbTzQ3YtNIwh", "fCOkG4dtVeAJEMfaeUJHBQZkbCxnoNtIefq1i7Mb");
+
+			function redirect(){
+				if(Parse.User.current()){
+					window.location.replace('/charts');
+					return;
+				}
+			}
+			redirect();
+		</script>
+
+
+		<a href = "/charts" id = "left_1">Skip</a>
+
+		<div class = "container" id = "centered_1" >
+
+
+			<form class = "form-signing" id = "login-form" style = "display: block">
+
+				<h1 style = "font-size: 170px; text-align: center; margin-bottom: 150px; margin-right: 40px; margin-top: 250px; color: #B80000">FastFoodie</h1>
+
+				<input type = "email" id = "input-email" style = "margin-bottom: 35px" class = "login-input" placeholder = "Email" required autofocus>
+
+				<input type = "password" id = "input-pass" style = "margin-bottom: 30px" class = "login-input" placeholder = "Password" required>
+
+				<button style = "display: block; font-size: 80px;width: 960px; background-color: #B80000; color: #FFFFFF; height: 110px; margin-bottom: 20px" type = "submit"> Login</button>
+			</form>
+
+			<button class = "btn btn-lg btn-primary" style = "display: block; font-size: 80px;width: 960px; height: 110px; margin-bottom: 80px" type = "submit"> Log in with Facebook</button>
+
+			<a style = "color: #B80000; font-size: 80px;width: 900px; height: 110px; margin-bottom: 20px; margin-top: 80px; margin-left: 130px" id = "new-user"> Create an Account</a>
+
+
+			<form class = "form-signing" id = "signup-form" style = "display: none; margin-top: 100px; margin-bottom: 5px;">
+
+				<h2 style = 'margin-bottom: 40px; margin-left: 5px; margin-top: 50px; font-size: 60px; color: #B80000'> Join the FastFoodie Community.</h2>
+
+				<input style="display:none" type="text" name="fakeusernameremembered"/>
+
+				<input style="display:none" type="password" name="fakepasswordremembered"/>
+
+				<input type = "text" id = "signup-name" style = "margin-bottom: 30px" class = "login-input" placeholder = "Full name" required>
+
+				<select required class = 'login-input-select' id = 'gender' class = 'form-control' style = 'margin-bottom: 30px'><option value = '' disabled selected>Gender</option><option value = 'M'>Male</option><option value = 'F'>Female</option><option value = 'N'>Care not to specify</option></select>
+
+				<h2 style = 'margin-bottom: 30px; color: #B80000; font-size: 60px'>Birthday: </h2>
+
+				<select required id = 'month' class = 'form-control' style = 'margin-bottom: 30px; margin-right: 20px; height: 110px; width: 300px; display: inline'><option value = '' disabled selected>Month</option></select>
+
+				<select required id = 'day' class = 'form-control' style = 'margin-bottom: 30px; margin-right: 20px; height: 110px; width: 300px; display: inline'><option value = '' disabled selected>Day</option></select>
+
+				<select required id = 'year' class = 'form-control' style = 'margin-bottom: 30px; height: 110px; width: 300px; display: inline'><option value = '' disabled selected>Year</option>
+
+				<input type = 'text' class = 'login-input' id = 'zip' style = 'margin-bottom: 30px' placeholder = 'Zip Code' required minlength = '5' maxlength = '5'>
+
+				<input type = 'email' class = 'login-input' id = 'email-new' style = 'margin-bottom: 30px' placeholder = 'Email' required></input>
+
+				<input type = 'password' class = 'login-input' id = 'password' style = 'margin-bottom: 30px' placeholder = 'Password (Min 8 Characters)' required minlength = '8' maxlength = '30'></input>
+
+				<input type = 'password' class = 'login-input' id = 'c-password' style = 'margin-bottom: 30px' placeholder = 'Confirm Password' required minlength = '8' maxlength = '30'></input>
+
+				<button class = 'btn btn-lg btn-success' style = 'font-size: 80px;width: 960px; height: 110px; margin-bottom: 20px' id = 'new-user-submit' type = 'submit'> Create Your Account</button>
+
+
+			</form>
+
+		<script>
+
+			Parse.initialize("BZHPIWPedZvh1MTYYfwwJcr85aW9AbTzQ3YtNIwh", "fCOkG4dtVeAJEMfaeUJHBQZkbCxnoNtIefq1i7Mb");
+
+			document.addEventListener("touchstart", function(){}, true);
+
+			var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+			var thirty_one = [1, 3, 5, 7, 8, 10, 12];
+
+			function populate(){
+
+				//populate months selector
+				for(i = 1; i < 13; i++){
+					$('#month').append("<option value = '"+i+"'>"+months[i-1]+"</option>");
+				}
+
+				//populate days selector
+				for(i = 1; i < 32; i++){
+					$('#day').append("<option>"+i+"</option>");
+				}
+
+				//populate year selector
+				for(i = new Date().getFullYear(); i > 1920; i--){
+					$('#year').append("<option>"+i+"</option>");
+				}
+			}
+			populate();
+
+			$('#new-user').click(function(){
+
+				$('#or').remove();
+
+				$('#new-user').remove();
+
+				$('#signup-form').css('display', 'block');
+	
+				$('html,body').animate({scrollTop: $(document).height()-100 + "px"}, 1500);
+			});
+
+			$('#login-form').submit(function(event){
+
+				event.preventDefault();
+
+				if(Parse.User.current()){
+					alert("You are already logged in as " + Parse.User.current().get("name") + "!");
+					this.reset();
+					return;
+				}
+
+				var email = $('#input-email').val().toLowerCase();
+				var password = $('#input-pass').val();
+
+				Parse.User.logIn(email, password, {
+
+					success: function(user){
+
+						window.location.replace('/profile');
+						
+					}, 
+					error: function(user, error){
+						alert("Error: " + error.code + " " + error.message);
+					}
+				});
+
+				this.reset();
+			});
+
+			$('#signup-form').submit(function(event){
+
+				event.preventDefault();
+
+				if(Parse.User.current()){
+					alert("You are already logged in as " + Parse.User.current().get("name") + "!");
+					this.reset();
+					return;
+				}
+
+				var email = $('#email-new').val().toLowerCase();
+				var name = $('#signup-name').val();
+				var gender = $('#gender').val();
+				var day = $('#day').val();
+				var month = $('#month').val();
+				var year = $('#year').val();
+				var zip = $('#zip').val();
+				var pass = $('#password').val();
+				var confirm_pass = $('#c-password').val();
+				
+				if(confirm_pass != pass){
+
+					alert('Password fields did not match!');
+					//this.reset();
+					return;
+				}
+
+				//31 day check
+				if(day == 31){
+
+					var found = false;
+
+					for(i = 0; i < thirty_one.length; i++){
+
+						if(month == thirty_one[i]){
+							found = true;
+						}
+					}
+
+					if(!found){
+						alert('Date is not valid!');
+						//this.reset();
+						return;
+					}
+				}
+
+				//leap year check
+				if(month == 2){
+
+					//if its not a leap year, and day is 29, 30, or 31
+					if(year%4 != 0 && day > 28){
+						alert('Date is not valid!');
+						//this.reset();
+						return;
+					}
+					//if it is a leap year, and the day is 29, we're good
+					if(year %4 == 0 && day > 29){
+						alert('Date is not valid!');
+						return;
+					}
+				}
+
+				var user = new Parse.User();
+				user.set("username", email);
+				user.set("password", pass);
+				user.set("name", name);
+				user.set("gender", gender);
+				user.set("zip", zip);
+				user.set("birthday", month+"/"+day+"/"+year);
+				user.set("comments", 0);
+
+				user.signUp(null, {
+					success: function(user){
+						if(!alert('Your account was created successfully!')){window.location.replace("/restaurants");}
+					},
+					error: function(user, error){
+						alert("Error: " + error.code + " " + error.message);
+					}
+				});
+			});
+
+		</script>
+	</body>
+</html>

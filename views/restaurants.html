@@ -1,0 +1,124 @@
+<html lang = "en">
+
+	<head>
+		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+  		<script type="text/javascript" src="http://www.parsecdn.com/js/parse-1.5.0.min.js"></script>
+		<link href = "/stylesheets/bootstrap.css" rel="stylesheet" media = "screen">
+		<link href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+		<meta name="viewport" content= "user-scalable=no">
+	</head>
+
+	<body>
+
+		<div id = "dynamic">
+
+			<span class = "icon"><i id = "search_i" class = "fa fa-search"></i></span>
+			<input type = "text" id = "search_res" placeholder = "         Search Restaurants" />
+
+			<div id = "res-list" style = "padding-bottom: 125px">
+
+				<ul id = "res_list_ul">
+
+				</ul>
+
+			</div>
+
+			<div>
+
+				<footer>
+
+					<ul class = "nav nav-pills navbar-fixed-bottom">
+
+						<li id = "bott-nav" >
+							<a style = "padding-left: 34px; padding-right: 34px" href = "/charts">Top Charts</a>
+						</li>
+
+						<li class = "active" id = "bott-nav">
+							<a href = "/restaurants">Restaurants</a>
+						</li>
+
+						<li id = "bott-nav">
+							<a style = "padding-left: 86px; padding-right: 88px" href = "/profile">Profile</a>
+						</li>
+					</ul>
+				</footer>
+			</div>
+		</div>
+		
+
+	</body>
+
+	<script type="text/javascript">
+
+		Parse.initialize("BZHPIWPedZvh1MTYYfwwJcr85aW9AbTzQ3YtNIwh", "fCOkG4dtVeAJEMfaeUJHBQZkbCxnoNtIefq1i7Mb");
+
+		document.addEventListener("touchstart", function(){}, true);
+
+		var Restaurant = Parse.Object.extend("Restaurant");
+
+		function populate(){
+
+			var query = new Parse.Query(Restaurant);
+
+			query.ascending("name");
+
+			query.find({
+
+				success: function(results){
+
+					var output = "";
+					for(var i in results){
+
+						//style = 'width: 25%;height: '25%' 
+						output += "<li><a style = 'font-color: #000000' href = '/restaurants/"+results[i].get("camel")+"'>";
+						output += "<div class = 'res_element' style = 'margin-botton: 7px; background-color: #FFFFFF'>"
+						output += "<img class = 'img-responsive' src ="+"'"+results[i].get("img")+"'>";
+						output += "<h1>"+results[i].get("name")+"</h1>";
+						output += "</div></a><hr id = 'hr'></li>";
+						
+					}
+					$("#res_list_ul").html(output);
+
+				}, error: function(error){
+
+					$("#res-list").html("<h1>No Restaurants in DB!</h1>");
+				}
+			});
+
+			setTimeout(function(){
+				document.getElementById("dynamic").style.display = "block";
+			}, 300);
+		}
+
+		populate();
+
+		$('#search_res').keyup(function(){
+			var search_val = $(this).val().toLowerCase();
+			if(search_val === ""){
+				$('#res_list_ul > li').each(function(){
+					$(this).show();
+				});
+			}
+			else{
+				$('#res_list_ul > li').each(function(){
+
+					//restaurant text
+					var text = $(this).text().toLowerCase();
+
+					//if search value is larger than res, hide
+					if(search_val.length > text.length){
+						$(this).hide();
+					}
+					else{
+						console.log("Search Term: " + search_val);
+						console.log("Res Fragment: "+ text.substring(0, search_val.length));
+
+						(text.substring(0, search_val.length) === search_val) ? $(this).show() : $(this).hide();
+					}
+				});
+			}
+		});
+
+	</script>
+</html>
+

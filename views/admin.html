@@ -1,0 +1,192 @@
+<html lang = "en">
+
+	<head>
+		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+  		<script type="text/javascript" src="http://www.parsecdn.com/js/parse-1.5.0.min.js"></script>
+		<link href = "/stylesheets/bootstrap.css" rel="stylesheet" media = "screen">
+	</head>
+
+	<body style = "padding-left: 4%">
+
+		<div id = "main">
+			<h1 style = "font-size: 70px; margin-top: 2%"> Add a Restaurant </h1>
+
+			<form style = "margin-top: 3%" class = "form-horizontal" id = "restaurant_form">
+
+				<p style = "font-size: 50px; margin-bottom: 2%">Name: </p><input style = "margin-bottom: 3%" class = "login-input" id = "res-name" type = "text">
+				<p style = "font-size: 50px; margin-bottom: 1%">Delimited Name: </p><input style = "margin-bottom: 2%" class = "login-input" id = "camel-name" type = "text" required>
+				<p style = "font-size: 50px; margin-bottom: 2%">Image URL: </p><input style = "margin-bottom: 3%" class = "login-input" id = "res-pic" type = "url" required>
+				<input style = "width: 900px; height: 50px; font-size: 40px" id = "res-submit" class = "btn btn-success"type = "submit" required>
+
+			</form>
+
+			<h1 style = "font-size: 70px; margin-top: 5%; margin-bottom: 5%"> Add a Menu Item</h1>
+			<form class = "form-horizontal" id = "item_form">
+
+				<p style = "font-size: 50px; margin-bottom: 2%">To Which Restaurant? </p><select class = "login-input-select" style = "font-size: 40px; margin-bottom: 2%" id = "res-list" required>
+
+					<!-- JQuery Happening Here -->
+
+				</select>
+
+				<p style = "font-size: 50px; margin-bottom: 2%">Name: </p><input style = "margin-bottom: 2%" class = "login-input" type = "text" id = "item-name" required>
+				<p style = "font-size: 50px; margin-bottom: 2%">Delimited Name: </p><input style = "margin-bottom: 2%" class = "login-input" id = "cam-name" type = "text" required>
+				<p style = "font-size: 50px; margin-bottom: 2%">Image URL: </p><input style = "margin-bottom: 2%" class = "login-input" id = "item-pic" type = "url" required>
+				<p style = "font-size: 50px; margin-bottom: 2%">Price: </p><input style = "margin-bottom: 2%" class = "login-input" id = "item-price" type = "number" min = "0" step="0.01" required>
+				<p style = "font-size: 50px; margin-bottom: 2%">Calories: </p><input style = "margin-bottom: 2%" class = "login-input" id = "item-calories" type = "number" min = "0" required>
+				<p style = "font-size: 50px; margin-bottom: 2%">Pro Rating (Out of 10): </p><input style = "margin-bottom: 2%" class = "login-input" id = "item-score" type = "number" min = "0" max = "10" required>
+				<input  style = "width: 900px; height: 60px; font-size: 40px" id = "res-submit" class = "btn btn-success"type = "submit">
+			</form>
+
+		</div>
+
+		<a href = "/restaurants" style = "width: 875px; height: 50px; line-height: 50px; font-size: 40px; margin-top: 1.5%; margin-bottom: 3%" role = "button" class = "btn btn-primary"> Go To Restaurants Page </a>
+
+		<button style = "width: 875px; height: 50px; line-height: 50px; font-size: 40px; margin-bottom: 3%" class = "btn btn-danger" id = "logout">Logout</button>
+
+
+
+		<script type="text/javascript">
+
+			Parse.initialize("BZHPIWPedZvh1MTYYfwwJcr85aW9AbTzQ3YtNIwh", "fCOkG4dtVeAJEMfaeUJHBQZkbCxnoNtIefq1i7Mb");
+
+			document.addEventListener("touchstart", function(){}, true);
+
+			var Restaurant = Parse.Object.extend("Restaurant");
+
+			function getNames(){
+				
+				var query = new Parse.Query(Restaurant);
+
+				query.ascending("name");
+
+				query.find({
+
+					success: function(results){
+
+						var output = "";
+						for(var i in results){
+
+							var name = results[i].get("name");
+							output += "<option>"+name+"</option>";
+						}
+						$("#res-list").html(output);
+
+
+					}, error: function(error){
+
+						console.log("Query error"+error.message);
+					}
+				});
+			}
+			getNames();
+
+			$("#logout").click(function(event){
+
+				if(Parse.User.current()){
+
+					Parse.User.logOut();
+
+					if(!alert('You have been logged out, see you next time!')){window.location.replace('/login');}
+				}
+				else{
+
+					alert("You aren't logged in!");
+					return;
+				}
+			});
+
+			$("#restaurant_form").submit(function(event){
+
+				event.preventDefault();
+
+				var res_name = $("#res-name").val();
+				var img_url = $("#res-pic").val();
+				var cam_name = $("#camel-name").val();
+
+				var newRestaurant = new Restaurant();
+
+				newRestaurant.set("name", res_name);
+				newRestaurant.set("img", img_url);
+				newRestaurant.set("menu", 0);
+				newRestaurant.set("camel", cam_name);
+
+				newRestaurant.save({
+
+					success: function(){
+
+					},error: function(error){
+
+						console.log("Error:"+error.message);
+
+					}
+				});
+
+				this.reset();
+			});
+
+			$("#item_form").submit(function(event){
+
+				event.preventDefault();
+
+				var item_name = $("#item-name").val();
+				var item_url = $("#item-pic").val();
+				var item_price = $("#item-price").val();
+				var item_cal = $("#item-calories").val();
+				var item_score = $("#item-score").val();
+				var item_place = $("#res-list").val();
+				var camel_name = $("#cam-name").val();
+
+				var Item = Parse.Object.extend("Item");
+
+				var newItem = new Item();
+
+				newItem.set("name", item_name);
+				newItem.set("camel", camel_name);
+				newItem.set("place", item_place);
+				newItem.set("price", parseFloat(item_price));
+				newItem.set("calories", parseInt(item_cal));
+				newItem.set("value", +(parseInt(item_cal)/parseInt(item_price)).toFixed(1));
+				newItem.set("pic", item_url);
+				newItem.set("pro_score", parseInt(item_score));
+				newItem.set("rate_total", 0);
+				newItem.set("eater_score", 0);
+				newItem.set("rate_num", 0);
+
+				var query = new Parse.Query(Restaurant);
+
+				console.log(item_name);
+
+				query.equalTo("name", item_place);
+
+				var res;
+				
+				query.first({
+
+					success: function(results){
+
+						results.increment("menu");
+
+						newItem.set("place_camel", results.get("camel"));
+
+						newItem.save();
+
+						results.save({success: function(){}, error: function(error){}});
+
+
+					}, error: function(error){
+
+						console.log("Query error"+error.message);
+					}
+				});
+
+				//newItem.save({success: function(){}, error: function(error){}});
+
+				this.reset();
+
+			});
+
+
+  		</script>
+	</body>
+</html>

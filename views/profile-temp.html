@@ -1,0 +1,176 @@
+<html lang = "en">
+
+	<head>
+		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+  		<script type="text/javascript" src="http://www.parsecdn.com/js/parse-1.5.0.min.js"></script>
+  		<script type = "text/javascript" src = "/javascripts/bootstrap.js"></script>
+  		<script type = "text/javascript" src = "/jquery-bar-rating-master/jquery.barrating.js"></script>
+		<link href = "/stylesheets/bootstrap.css" rel="stylesheet" media = "screen">
+		<link href = "/jquery-bar-rating-master/bars-square.css" rel="stylesheet" media = "screen">
+
+		<meta content = "viewport" content = "user-scalable=no">
+
+
+	</head>
+
+	<body>
+
+		<div id = "dynamic">
+
+			<div class = "row">
+
+				<a id = "back_btn" onclick = "goBack()"></a>
+
+			</div>
+
+			<div id = "profile_header" style = "width: 960px">
+
+				<div>
+
+					<div id = "prof_pic" style = "margin-left: 20px">
+
+					</div>
+
+					<p id = "name">
+
+					</p>
+
+					<p id = "location">Long Beach, CA</p>
+
+					<h3 id = "num_comments">
+
+					</h3>
+				</div>
+
+			</div>
+
+
+			<div id = "comment-section" style = "margin-bottom: 0px">
+
+				<h1 id = "recent_reviews"> Recent Reviews</h1>
+
+				<hr>
+
+			</div>
+		</div>
+
+	</body>
+
+	<script>
+
+		Parse.initialize("BZHPIWPedZvh1MTYYfwwJcr85aW9AbTzQ3YtNIwh", "fCOkG4dtVeAJEMfaeUJHBQZkbCxnoNtIefq1i7Mb");
+
+		document.addEventListener("touchstart", function(){}, true);
+
+		var Comments = Parse.Object.extend("Comment");
+
+		var Item = Parse.Object.extend("Item");
+
+		var User = Parse.Object.extend("User");
+
+		var parser = window.document.createElement("a");
+
+		parser.href = window.location.href;
+
+		var current = parser.pathname.replace("/profile/", "");
+
+		var res = current.split("/");
+
+		var user_id = res[0];
+
+		function goBack(){
+			window.history.back();
+		}
+
+		function populate(){
+
+			if(Parse.User.current().id == user_id){
+				window.location.replace("/profile");
+				return;
+			}
+
+			var query = new Parse.Query(User);
+
+			query.equalTo("objectId", user_id);
+
+			query.first({
+
+				success: function(user){
+
+					if(user.get("profile_picture") == undefined){
+
+						$('#prof_pic').append('<img class = "img-responsive" id = "circle" style = "z-index: -1;height: 300px; width: 300px" src = "http://cdn.mysitemyway.com/icons-watermarks/simple-gray/raphael/raphael_bubble-question-mark/raphael_bubble-question-mark_simple-gray_512x512.png">');
+					}
+					else{
+
+						var file = user.get("profile_picture");
+
+						var url = file.url();
+
+						$('#prof_pic').css("background", "url("+url+") no-repeat center");
+						$('#prof_pic').css("background-size", "100% 100%");
+					}
+
+					$('#name').append(user.get("name"));
+
+					var date = user.createdAt;
+
+					$('#usersince').append("User Since: " +(date.getMonth()+1) + "/" + date.getDate() + "/" + date.getFullYear());
+
+					//$('#num_comments').append(user.get("comments") + " Reviews");
+				},
+
+				error: function(error){
+					console.log(error.message);
+				}
+			});
+
+			var query = new Parse.Query(Comments);
+
+			query.limit(10);
+
+			query.descending("createdAt");
+
+			query.equalTo("userId", user_id);
+
+			var output = "";
+
+			query.find({
+
+				success: function(comments){
+
+					for(var i in comments){
+
+						//var pic = Parse.User.current().get("profile_picture").url();
+						
+						output += "<div class = 'row'>";
+						output += "<a href = '/restaurants/"+comments[i].get("from_place")+'/'+comments[i].get("from")+"'>";
+						output += "<div class = 'span2' id = 'comment_pic' style = 'margin-top: 15px; background: url("+comments[i].get("from_pic")+") no-repeat center; background-size: 100% 100%'></div>";
+						output += "<div id = 'comment_wrap'>";
+						output += "<h3 id = 'comment_heading'>"+comments[i].get("from_norm")+" @ "+comments[i].get("from_place_norm")+"</h3>";
+						output += "<h3 id = 'date'>"+comments[i].createdAt.toDateString()+"</h3>";
+						output += "<span id = 'comment'>"+comments[i].get("body")+"</span>";
+						output += "</div>";
+						output += "</a>";
+						output += "</div><hr>";
+
+						$('#comment-section').append(output);
+
+						output = "";
+					}
+
+				}, 
+				error: function(error){
+					console.log("error " + error.message);
+				}
+			});	
+
+			setTimeout(function(){
+				document.getElementById("dynamic").style.display = "block";
+			}, 300);
+			
+		}
+
+		populate();
+
+	</script>

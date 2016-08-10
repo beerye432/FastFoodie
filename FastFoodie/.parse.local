@@ -1,0 +1,10 @@
+{
+  "applications": {
+    "FastFoodie": {
+      "applicationId": "BZHPIWPedZvh1MTYYfwwJcr85aW9AbTzQ3YtNIwh"
+    },
+    "_default": {
+      "link": "FastFoodie"
+    }
+  }
+}
