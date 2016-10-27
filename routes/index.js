@@ -6,6 +6,7 @@ router.get('/', function(req, res, next) {
   res.render('login', { title: 'Express' });
 });
 
+//I'm not sure why you have so much logic in one route file ... -_-
 router.get('/admin', function(req, res, next){
 	res.render('admin', {title: 'Admin' });
 })
